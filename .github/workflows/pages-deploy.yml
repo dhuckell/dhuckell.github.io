@@ -2,8 +2,7 @@ name: "Build and Deploy"
 on:
   push:
     branches:
-      - main
-      - master
+      - dev      
     paths-ignore:
       - .gitignore
       - README.md
@@ -24,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -65,7 +64,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     steps:
       - name: Deploy to GitHub Pages
