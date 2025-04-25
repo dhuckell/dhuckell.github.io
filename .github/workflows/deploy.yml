@@ -55,21 +55,26 @@ jobs:
     steps:
     - name: Stop Jekyll Server    
       run: |
-        $job = Get-Job -Name JekyllServer
-        if ($job) {
-          Write-Host "Found Jekyll server job with ID: $($job.Id)"
-          Stop-Job -Id $job.Id
-          Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds for the job to stop
-          if ($?) {
-            Remove-Job -Id $job.Id
-            Write-Host "Jekyll server stopped successfully."
-          } else {
-            Write-Error "Error occurred while stopping the Jekyll server job."
-            # Optionally, you might want to fail the workflow here:
-            # exit 1
+        Write-Host "Attempting to find Jekyll server job named 'localjekyll'..."
+        $jobs = Get-Job -Name localjekyll
+        if ($jobs) {
+          Write-Host "Found the following job(s) with the name 'localjekyll':"
+          foreach ($job in $jobs) {
+            Write-Host "  ID: $($job.Id), State: $($job.State)"
+            Write-Host "  Stopping job with ID: $($job.Id)..."
+            Stop-Job -Id $job.Id
+            Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds
+            if ($?) {
+              Remove-Job -Id $job.Id
+              Write-Host "  Job with ID $($job.Id) stopped and removed successfully."
+            } else {
+              Write-Error "  Error occurred while stopping job with ID $($job.Id)."
+              # Consider if you want to exit here
+              # exit 1
+            }
           }
         } else {
-          Write-Warning "Jekyll server job not found. It might not have been started or already finished."
+          Write-Warning "No job found with the name 'localjekyll'."
         }
 
     - name: Start Jekyll Server in Background
