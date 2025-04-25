@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout
@@ -50,7 +50,7 @@ jobs:
           JEKYLL_ENV: "production"
 
   deploy:    
-    runs-on: windows-latest
+    runs-on: self-hosted
     needs: build
     steps:
       - name: Deploy to localhost
