@@ -54,8 +54,7 @@ jobs:
     needs: build
     steps:
     - name: Stop Jekyll Server    
-      run: |
-        run: |
+      run: |        
         Write-Host "Attempting to find Jekyll server job named 'localjekyll'..."
         try {
           $jobs = Get-Job -Name localjekyll
