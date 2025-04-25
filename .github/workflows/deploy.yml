@@ -55,26 +55,31 @@ jobs:
     steps:
     - name: Stop Jekyll Server    
       run: |
+        run: |
         Write-Host "Attempting to find Jekyll server job named 'localjekyll'..."
-        $jobs = Get-Job -Name localjekyll
-        if ($jobs) {
-          Write-Host "Found the following job(s) with the name 'localjekyll':"
-          foreach ($job in $jobs) {
-            Write-Host "  ID: $($job.Id), State: $($job.State)"
-            Write-Host "  Stopping job with ID: $($job.Id)..."
-            Stop-Job -Id $job.Id
-            Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds
-            if ($?) {
-              Remove-Job -Id $job.Id
-              Write-Host "  Job with ID $($job.Id) stopped and removed successfully."
-            } else {
-              Write-Error "  Error occurred while stopping job with ID $($job.Id)."
-              # Consider if you want to exit here
-              # exit 1
+        try {
+          $jobs = Get-Job -Name localjekyll
+          if ($jobs) {
+            Write-Host "Found the following job(s) with the name 'localjekyll':"
+            foreach ($job in $jobs) {
+              Write-Host "  ID: $($job.Id), State: $($job.State)"
+              Write-Host "  Stopping job with ID: $($job.Id)..."
+              Stop-Job -Id $job.Id
+              Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds
+              if ($?) {
+                Remove-Job -Id $job.Id
+                Write-Host "  Job with ID $($job.Id) stopped and removed successfully."
+              } else {
+                Write-Error "  Error occurred while stopping job with ID $($job.Id)."
+                # Consider if you want to exit here
+                # exit 1
+              }
             }
+          } else {
+            Write-Warning "No job found with the name 'localjekyll'."
           }
-        } else {
-          Write-Warning "No job found with the name 'localjekyll'."
+        } catch {
+          Write-Warning "Error encountered while trying to find the job 'localjekyll': $($_.Exception.Message)"
         }
 
     - name: Start Jekyll Server in Background
