@@ -44,7 +44,7 @@ jobs:
       #    ruby-version: 3.4
       #    bundler-cache: true
 
-      - name: Build site
+      - name: Build Jekyll Site
         run: bundle exec jekyll b -d "_site${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: "production"
@@ -53,22 +53,26 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-    #- name: Stop Jekyll Server
-    #  run: |
-    #    $job = Get-Job -Name JekyllServer
-    #    if ($job) {
-    #      Stop-Job -Id $job.Id
-    #      Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds for the job to stop
-    #      Remove-Job -Id $job.Id
-    #      echo "Jekyll server stopped successfully."
-    #    } else {
-    #      echo "Jekyll server job not found."
-    #    }
+    - name: Stop Jekyll Server    
+      run: |
+        $job = Get-Job -Name JekyllServer
+        if ($job) {
+          Write-Host "Found Jekyll server job with ID: $($job.Id)"
+          Stop-Job -Id $job.Id
+          Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds for the job to stop
+          if ($?) {
+            Remove-Job -Id $job.Id
+            Write-Host "Jekyll server stopped successfully."
+          } else {
+            Write-Error "Error occurred while stopping the Jekyll server job."
+            # Optionally, you might want to fail the workflow here:
+            # exit 1
+          }
+        } else {
+          Write-Warning "Jekyll server job not found. It might not have been started or already finished."
+        }
 
-    - name: Deploy to localhost        
-      run: Start-Job -ScriptBlock { bundle exec jekyll s }
-
-    - name: Wait for a bit to ensure server starts
-      run: Start-Sleep -Seconds 5
+    - name: Start Jekyll Server in Background
+      run: Start-Job -Name localjekyll -ScriptBlock { bundle exec jekyll s }
 
 
