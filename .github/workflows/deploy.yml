@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: self-hosted, win11
+    runs-on: self-hosted
 
     steps:
       - name: Checkout
