@@ -53,17 +53,17 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-    - name: Stop Jekyll Server
-      run: |
-        $job = Get-Job -Name JekyllServer
-        if ($job) {
-          Stop-Job -Id $job.Id
-          Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds for the job to stop
-          Remove-Job -Id $job.Id
-          echo "Jekyll server stopped successfully."
-        } else {
-          echo "Jekyll server job not found."
-        }
+    #- name: Stop Jekyll Server
+    #  run: |
+    #    $job = Get-Job -Name JekyllServer
+    #    if ($job) {
+    #      Stop-Job -Id $job.Id
+    #      Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds for the job to stop
+    #      Remove-Job -Id $job.Id
+    #      echo "Jekyll server stopped successfully."
+    #    } else {
+    #      echo "Jekyll server job not found."
+    #    }
 
     - name: Deploy to localhost        
       run: Start-Job -ScriptBlock { bundle exec jekyll s }
