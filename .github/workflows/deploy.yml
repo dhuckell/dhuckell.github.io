@@ -56,4 +56,3 @@ jobs:
       - name: Deploy to localhost        
         run: bundle exec jekyll s
 
-
