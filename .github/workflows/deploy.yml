@@ -55,3 +55,4 @@ jobs:
     steps:
       - name: Deploy to localhost        
         run: bundle exec jekyll s
+        
