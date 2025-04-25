@@ -39,8 +39,7 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Setup Ruby
-        uses: actions/checkout@v4
-        uses: ruby/setup-ruby@v1
+        uses: actions/checkout@v4, ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
           bundler-cache: true
