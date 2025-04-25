@@ -1,8 +1,8 @@
-name: "Build and Deploy"
+name: "pull dev and self host"
 on:
   push: 
     branches:
-      - dev      
+      - dev
     paths-ignore:
       - .gitignore
       - README.md
