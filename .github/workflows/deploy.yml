@@ -53,6 +53,5 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-      - name: Deploy to localhost
-        uses: actions/checkout@v4
+      - name: Deploy to localhost        
         run: bundle exec jekyll s
