@@ -54,5 +54,8 @@ jobs:
     needs: build
     steps:
       - name: Deploy to localhost        
-        run: bundle exec jekyll s
+        run: Start-Job -ScriptBlock { bundle exec jekyll s }
+
+      - name: Wait for a bit to ensure server starts
+        run: Start-Sleep -Seconds 5
 
