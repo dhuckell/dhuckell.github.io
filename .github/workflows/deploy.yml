@@ -1,0 +1,87 @@
+name: "pull dev and self host"
+on:
+  push: 
+    branches:
+      - dev
+    paths-ignore:
+      - .gitignore
+      - README.md
+      - LICENSE
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # submodules: true
+          # If using the 'assets' git submodule from Chirpy Starter, uncomment above
+          # (See: https://github.com/cotes2020/chirpy-starter/tree/main/assets)
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
+
+      #- name: Setup Ruby
+      #  uses: ruby/setup-ruby@v1
+      #  with:
+      #    ruby-version: 3.4
+      #    bundler-cache: true
+
+      - name: Build Jekyll Site
+        run: bundle exec jekyll b -d "_site${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: "production"
+
+  deploy:    
+    runs-on: self-hosted
+    needs: build
+    steps:
+    - name: Stop Jekyll Server    
+      run: |        
+        Write-Host "Attempting to find Jekyll server job named 'localjekyll'..."
+        try {
+          $jobs = Get-Job -Name localjekyll
+          if ($jobs) {
+            Write-Host "Found the following job(s) with the name 'localjekyll':"
+            foreach ($job in $jobs) {
+              Write-Host "  ID: $($job.Id), State: $($job.State)"
+              Write-Host "  Stopping job with ID: $($job.Id)..."
+              Stop-Job -Id $job.Id
+              Wait-Job -Id $job.Id -Timeout 60 # Wait up to 60 seconds
+              if ($?) {
+                Remove-Job -Id $job.Id
+                Write-Host "  Job with ID $($job.Id) stopped and removed successfully."
+              } else {
+                Write-Error "  Error occurred while stopping job with ID $($job.Id)."
+                # Consider if you want to exit here
+                # exit 1
+              }
+            }
+          } else {
+            Write-Warning "No job found with the name 'localjekyll'."
+          }
+        } catch {
+          Write-Warning "Error encountered while trying to find the job 'localjekyll': $($_.Exception.Message)"
+        }
+
+    - name: Start Jekyll Server in Background
+      run: Start-Job -Name localjekyll -ScriptBlock { bundle exec jekyll s }
+
+
